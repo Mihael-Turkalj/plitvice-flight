@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #06110f;
+  --color-deep: #0b1b18;
+  --color-moss: #14302a;
+  --color-foam: #efebe1;
+  --color-mist: #a3b8b1;
+  --color-lake: #66d9cc;
+  --color-lake-deep: #1f8f86;
+
+  /* Strong ease-out from the animate skill; also overrides Tailwind's ease-out utility. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-foam);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01';
+    background: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-lake);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-lake);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+}
+
+/* The nav steps aside while the flight has the whole screen. */
+html[data-in-flight='true'] .site-nav {
+  transform: translateY(-160%);
+}
+
+/* Knowledge cards: pop in from their own edge, lines staggered; leave faster the way they came. */
+.flight-card {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) scale(0.96);
+  transform-origin: var(--origin, left center);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+.flight-card[data-on='true'] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 320ms;
+}
+.flight-card [data-line] {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition:
+    opacity 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+.flight-card[data-on='true'] [data-line] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 300ms;
+}
+.flight-card[data-on='true'] [data-line='1'] {
+  transition-delay: 50ms;
+}
+.flight-card[data-on='true'] [data-line='2'] {
+  transition-delay: 100ms;
+}
+.drop-gauge {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+.drop-gauge[data-on='true'] {
+  opacity: 1;
+  transform: none;
+  transition-duration: 300ms;
+}
+@media (min-width: 768px) {
+  .drop-gauge {
+    transform: translate3d(0, calc(-50% + 12px), 0);
+  }
+  .drop-gauge[data-on='true'] {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+/* Sections below the flight: content rises into place once, the first time it is seen. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 700ms var(--ease-out);
+}
+.reveal[data-in='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    transform: none !important;
+  }
+  .flight-card,
+  .flight-card [data-line] {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Film grain over everything: keeps the dark surfaces from looking flat. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@utility label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@utility display {
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--color-ink) 55%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--color-foam) 12%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
