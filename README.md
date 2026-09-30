@@ -1,5 +1,7 @@
 # Plitvice: Follow the Kingfisher
 
+![Scrolling through the flight: the kingfisher crosses the lakes and waterfalls while the knowledge cards appear](media/preview.webp)
+
 **Live site:** https://mihael-turkalj.github.io/plitvice-flight/
 
 An unofficial showcase of Plitvice Lakes National Park. You scroll to fly through the park behind a kingfisher: from the highest lake, through the Upper and Lower Lakes, down the 78 m of Veliki slap and out along the Korana. Knowledge cards pop up along the way (facts, legends and elevations), and a counter tracks the metres fallen during the dive. Scrolling back rewinds the flight.

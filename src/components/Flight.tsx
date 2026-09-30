@@ -39,6 +39,17 @@ export default function Flight() {
   return reduced ? <FlightStills /> : <FlightStage />
 }
 
+/** Resolves 1.5 s after the page has loaded, at the browser's next quiet moment: the opening screen is
+    painted and being read by then, and the flight still arrives before the first scroll. */
+function afterFirstScreen() {
+  return new Promise<void>((resolve) => {
+    const idle = () => ('requestIdleCallback' in window ? window.requestIdleCallback(() => resolve(), { timeout: 1000 }) : setTimeout(resolve, 300))
+    const later = () => setTimeout(idle, 1500)
+    if (document.readyState === 'complete') later()
+    else window.addEventListener('load', later, { once: true })
+  })
+}
+
 function FlightStage() {
   const stageRef = useRef<HTMLDivElement>(null)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
@@ -51,13 +62,26 @@ function FlightStage() {
   const [stop, setStop] = useState(0)
   const [segment, setSegment] = useState(0)
   const [loadedCount, setLoadedCount] = useState(0)
+  // only the first shot is on screen at the start; the other posters wait until the page has loaded
+  const [allPosters, setAllPosters] = useState(false)
   const hd = useHd()
 
+  useEffect(() => {
+    let live = true
+    afterFirstScreen().then(() => live && setAllPosters(true))
+    return () => {
+      live = false
+    }
+  }, [])
+
   // Download the shots in flight order. Seeking inside a local blob is instant and never stalls.
+  // The flight is over 20 MB, so it waits until the first screen has painted: the words come first.
   useEffect(() => {
     const ctrl = new AbortController()
     const urls: string[] = []
     ;(async () => {
+      await afterFirstScreen()
+      if (ctrl.signal.aborted) return
       for (let k = 0; k < segments.length; k++) {
         try {
           const res = await fetch(base + segmentFile(segments[k].id, hd), { signal: ctrl.signal })
@@ -196,7 +220,7 @@ function FlightStage() {
             muted
             playsInline
             preload="auto"
-            poster={base + segmentPoster(s.id)}
+            poster={k === 0 || allPosters ? base + segmentPoster(s.id) : undefined}
             aria-hidden="true"
             className={`absolute inset-0 h-full w-full object-cover ${k === segment ? 'opacity-100' : 'opacity-0'}`}
           />

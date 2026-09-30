@@ -1,5 +1,6 @@
 import { sources } from '../data/content'
 import { flightSources } from '../data/flight'
+import { allWork, lab } from '../data/lab'
 import { parkPhotos } from '../data/park'
 import { photoCredits } from '../lib/photo'
 import { WaterMark } from './Nav'
@@ -50,6 +51,28 @@ export default function Footer() {
           </ul>
         </div>
       </div>
+
+      {/* the rest of the lab, so one visit leads to the next */}
+      <nav aria-labelledby="lab-title" className="mx-auto max-w-7xl border-t border-foam/10 px-6 py-12 md:px-12">
+        <h2 id="lab-title" className="label text-foam/60">
+          More from the lab
+        </h2>
+        <ul className="mt-6 grid gap-6 sm:grid-cols-3">
+          {lab
+            .filter((l) => l.id !== 'plitvice-flight')
+            .map((l) => (
+              <li key={l.id}>
+                <a href={l.href} className="group block">
+                  <span className="block text-lg font-light text-foam underline decoration-foam/30 underline-offset-4 group-hover:decoration-foam">{l.title}</span>
+                  <span className="mt-1 block text-sm text-mist">{l.what}</span>
+                </a>
+              </li>
+            ))}
+        </ul>
+        <a href={allWork} className="mt-8 inline-flex text-sm text-foam/70 transition-colors hover:text-foam">
+          All work by Mihael Turkalj →
+        </a>
+      </nav>
 
       {/* Most photos are CC BY / CC BY-SA, which require crediting their authors. */}
       <div className="mx-auto max-w-7xl border-t border-foam/10 px-6 py-6 text-xs text-foam/55 md:px-12">
